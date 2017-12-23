@@ -94,4 +94,11 @@ git submodule init vendor/xUnit
 git add --all
 git commit -m "Set submodules"
 
-precommit1C --instal
+precommit1C --install
+
+mk .gitignore
+echo *.log >> .gitignore
+echo /Build >> .gitignore
+
+git add --all
+git commit "Set gitignore"
