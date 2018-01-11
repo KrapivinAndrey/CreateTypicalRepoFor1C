@@ -1,4 +1,4 @@
-chcp 65001
+chcp 1251
 @echo off
 
 echo Инициализация git
@@ -36,25 +36,32 @@ echo Пользовательские инструкции хранятся в W
 
 echo Создаем каталог features
 mkdir features
+
 echo # Каталог features >> features/Readme.md
-echo. >> features//Readme.md
+echo. >> features/Readme.md
 echo Компоненты и функциональность продукта и автоматизированные сценарии проверки структурированные по подсистемам и объектам продукта >> features/Readme.md
 
 echo Создаем каталог features/lib
-mkdir features/Lib
+cd features
+mkdir Lib
+cd ..
 echo # Каталог features/lib >> features/Lib/Readme.md
 echo. >> features/lib/Readme.md
 echo Библиотеки для тестов на Vanessa. Рекомендуется добавить флаг Ignore >> features/lib/Readme.md
 
 echo Создаем каталог spec/fixture
 mkdir spec
-mkdir spec/fixture
+cd spec
+mkdir fixture
+cd ..
+
 echo # Каталог fixtures >> spec/fixture/Readme.md
 echo. >> spec/fixture/Readme.md
 echo Предназначен для хранения статичных данных загружаемых в базу данных, для целей демонстрации и для целей автоматизированной сборки >> spec/fixture/Readme.md
 
 echo Создаем каталог src
 mkdir src
+
 echo # Каталог src >> src/Readme.md
 echo. >> src/Readme.md
 echo Предназначен для хранения исходных текстов решения, созданных на платформе 1С:Предприятие, содержит: >> src/Readme.md
@@ -63,12 +70,14 @@ echo * исходные коды обработок, интегрированн�
 
 echo Создаем каталог tools
 mkdir tools
+
 echo # Каталог tools >> tools/Readme.md
 echo. >> tools/Readme.md
 echo Предназначен для хранения любых сторонних утилит, необходимых для настройки проекта или для дополнительной установки >> tools/Readme.md
 
 echo Создаем каталог Vendor
 mkdir vendor
+
 echo ### Каталог Vendors >> vendor/Readme.md
 echo. >> vendor/Readme.md
 echo предназначен для хранения внешних зависимостей - библиотек, конфигураций и т.для >> vendor/Readme.md
@@ -78,28 +87,34 @@ echo. >> vendor/Readme.md
 echo * vanessa-behavior - для разработки через поведение >> vendor/Readme.md
 
 git add --all
+git reset -- MakeRepo.bat
 git commit -m "first commit"
 
 Set local
 
+set needCommit = 0
 set /p "vb=Add VanessaBehavior? (y/n)"
 if /i "%vb%"=="Y" (git submodule add https://github.com/silverbulleters/vanessa-behavior.git vendor/vanessa-behavior
 git submodule init vendor/vanessa-behavior
+set needCommit = 1
 ) 
 
 set /p "xu=Add xUnit? (y/n)"
 if /i "%xu%"=="Y" (git submodule add https://github.com/xDrivenDevelopment/xUnitFor1C.git vendor/xUnit
-git submodule init vendor/xUnit)
+git submodule init vendor/xUnit
+set needCommit = 1)
 
-if /i "%xu%"=="Y"||"%vb%"=="Y" (git add --all
+if /i needCommit EQU 1 (git add --all
+git reset -- MakeRepo.bat
 git commit -m "Set submodules")
 
 echo Настройка игнорирования
+
 echo *.log >> .gitignore
 echo /Build >> .gitignore
 
-git add --all
-git commit "Set gitignore"
+git add .gitignore
+git commit -m "Set gitignore"
 
 echo Установка прекоммита
 precommit1C --install
